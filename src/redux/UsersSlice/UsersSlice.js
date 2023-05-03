@@ -2,11 +2,17 @@
 import * as redux from "@reduxjs/toolkit";
 import axios from "axios";
 
+/*
+
+User Data API: https://servers-omega.vercel.app/users/p?limit=10&page=10
+
+*/
+
 export const fetchUsers = redux.createAsyncThunk(
   "users/fetchUsers",
   async (page) => {
     const response = await axios.get(
-      `https://servers-omega.vercel.app/users/p?limit=10&page=${page}`
+      `https://servers-omega.vercel.app/users/p?limit=8&page=${page}`
     );
     return response.data;
   }
@@ -15,7 +21,11 @@ export const fetchUsers = redux.createAsyncThunk(
 const usersSlice = redux.createSlice({
   name: "posts",
   initialState: { data: [], status: "idle", error: null, pages: 0 },
-  reducers: {},
+  reducers: {
+    setIntialState: (state) => {
+      return { ...state, data: [] };
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUsers.pending, (state) => {
@@ -34,3 +44,4 @@ const usersSlice = redux.createSlice({
 });
 
 export default usersSlice.reducer;
+export const { setIntialState } = usersSlice.actions;

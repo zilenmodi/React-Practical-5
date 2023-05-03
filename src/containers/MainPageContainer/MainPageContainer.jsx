@@ -4,7 +4,8 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MainPageComponent from "../../components/MainPageComponent/MainPageComponent";
 import { hoveredUser, unHoveredUser } from "../../redux/UserSlice/UserSlice";
-import { fetchUsers } from "../../redux/UsersSlice/UsersSlice";
+import { fetchUsers, setIntialState } from "../../redux/UsersSlice/UsersSlice";
+import PaginateContainer from "../PaginateContainer/PaginateContainer";
 
 const MainPageContainer = () => {
   const dispatch = useDispatch();
@@ -13,7 +14,7 @@ const MainPageContainer = () => {
   const error = useSelector((state) => state.users.error);
   const pages = useSelector((state) => state.users.pages);
 
-  const [currentPage, setCurrentpage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleHoverMouseOnUser = (user) => {
     dispatch(hoveredUser(user));
@@ -24,23 +25,30 @@ const MainPageContainer = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchUsers(0));
-  }, [dispatch]);
-
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
+    dispatch(setIntialState());
+    dispatch(fetchUsers(currentPage));
+  }, [dispatch, currentPage]);
 
   if (status === "failed") {
     return <div>Error: {error}</div>;
   }
-  console.log(pages);
+
   return (
-    <MainPageComponent
-      users={users}
-      handleHoverMouseOnUser={handleHoverMouseOnUser}
-      handleHoverOutUser={handleHoverOutUser}
-    />
+    <>
+      <div className="main-page-container">
+        <MainPageComponent
+          users={users}
+          handleHoverMouseOnUser={handleHoverMouseOnUser}
+          handleHoverOutUser={handleHoverOutUser}
+          status={status}
+        />
+        <PaginateContainer
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          maxPages={pages}
+        />
+      </div>
+    </>
   );
 };
 
